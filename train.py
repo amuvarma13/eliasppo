@@ -18,9 +18,7 @@ import numpy as np
 import soundfile as sf
 import IPython.display as ipd
 import librosa
-from ipywebrtc import AudioRecorder, Audio
 from IPython.display import display
-import ipywidgets as widgets
 from datasets import Dataset
 from naturalspeech3_facodec.ns3_codec import FACodecEncoder, FACodecDecoder
 from huggingface_hub import hf_hub_download
