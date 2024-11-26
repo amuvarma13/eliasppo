@@ -19,13 +19,13 @@ from get_reward_from_audio import get_reward_from_audio
 model = AutoModelForCausalLMWithValueHead.from_pretrained(
     "amuvarma/luna-3days-tagged-noreps",
     attn_implementation="flash_attention_2",
-    torch_dtype=torch.float16
+    # torch_dtype=torch.float16
 )
 
 model = model.to("cuda")
 ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps", 
                                                               attn_implementation="flash_attention_2",
-    torch_dtype=torch.float16
+    # torch_dtype=torch.float16
 )
 
 freeze_except_qkv(model)
