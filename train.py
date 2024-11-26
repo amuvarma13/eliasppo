@@ -26,25 +26,13 @@ from peft import get_peft_model, LoraConfig, TaskType
 import torch
 
 
-peft_config = LoraConfig(
-    task_type=TaskType.CAUSAL_LM,
-    r=8,
-    lora_alpha=32,
-    lora_dropout=0.1,
-    bias="none",
-    target_modules=["q_proj", "v_proj", "k_proj", "o_proj" ]
-)
 
-
-# wandb.init(
-#     # set the wandb project where this run will be logged
-#     project="rlhf",
-# )
 
 
 model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
-model = get_peft_model(model, peft_config)
 model = model.to("cuda")
+
+print(model)
 
 ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 
