@@ -64,6 +64,7 @@ torch.save(response_tensor, "response.pt")
 ####################################################################################
 
 for i in range(100):
+    print(f"processing sample {i}")
     audio = convert_to_audio(response_tensor, tokenizer)
     audio_reward = get_reward_from_audio(audio )
     reward = [torch.tensor(audio_reward, dtype=torch.float32)]  # Example fixed reward
