@@ -33,6 +33,7 @@ import torch
 
 
 model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
+model = model.to("cuda")
 
 ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 
@@ -70,13 +71,14 @@ def generate_model_response(text, emotion):
 
     input_ids = modified_input_ids  # Ensure input IDs are on the correct GPU
     attention_mask = torch.ones_like(input_ids)
+    input_ids=  input_ids.to("cuda")
 
     generation_kwargs = {
         "pad_token_id": 128258,
         "top_k": 50,
         "temperature": 0.5,
         "repetition_penalty": 1.1,
-        "max_length": 2500,
+        "max_length": 100,
         "eos_token_id": 128258
     }
 
@@ -294,6 +296,8 @@ for i, (query, emotion) in enumerate(zip(queries, emotions)):
     audio = convert_to_audio(response_tensor)
     audio_reward = get_reward_from_audio(audio)
     reward = [torch.tensor(audio_reward)]  # Example fixed reward
+
+    
 
     # Step 6: Train model with PPO
     train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
