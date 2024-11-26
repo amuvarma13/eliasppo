@@ -291,16 +291,20 @@ emotion = "happy"
 
 query_tensor, response_tensor = generate_model_response(query, emotion)
 
-# Step 5: Compute reward
-# You can define your reward function or use a fixed reward for simplicity
-audio = convert_to_audio(response_tensor)
-audio_reward = get_reward_from_audio(audio)
-reward = [torch.tensor(audio_reward)]  # Example fixed reward
+torch.save(query_tensor, "query.pt")
+torch.save(response_tensor, "response.pt")
+
+
+# # Step 5: Compute reward
+# # You can define your reward function or use a fixed reward for simplicity
+# audio = convert_to_audio(response_tensor)
+# audio_reward = get_reward_from_audio(audio)
+# reward = [torch.tensor(audio_reward)]  # Example fixed reward
 
 
 
-# Step 6: Train model with PPO
-train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
+# # Step 6: Train model with PPO
+# train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
 
-# Close W&B run
-# wandb.finish()
+# # Close W&B run
+# # wandb.finish()
