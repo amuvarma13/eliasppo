@@ -203,20 +203,6 @@ def convert_to_audio(generated_ids):
 
 
 
-def process_speech_timestamps(timestamps):
-  if len(timestamps) == 0:
-    return 0, 0
-  elif len(timestamps) == 1:
-    start_time = timestamps[0]['start']
-    end_time = timestamps[0]['end']
-  else:
-    start_time = timestamps[0]['start']
-    end_time = timestamps[-1]['end']
-
-  return start_time, end_time
-
-
-
 
 query=  "The old family photographs brought back the sweetest childhood memories."
 emotion = "happy"

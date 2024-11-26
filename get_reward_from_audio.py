@@ -24,6 +24,21 @@ def preprocess_audio(audio_data, sample_rate=16000):
 
 
 
+def process_speech_timestamps(timestamps):
+  if len(timestamps) == 0:
+    return 0, 0
+  elif len(timestamps) == 1:
+    start_time = timestamps[0]['start']
+    end_time = timestamps[0]['end']
+  else:
+    start_time = timestamps[0]['start']
+    end_time = timestamps[-1]['end']
+
+  return start_time, end_time
+
+
+
+
 def get_reward_from_audio(audio, sample_rate=16000):
     audio_tensor = preprocess_audio(audio, sample_rate=sample_rate)
 

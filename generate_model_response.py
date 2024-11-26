@@ -15,7 +15,7 @@ def generate_model_response(text, emotion, model, tokenizer):
     modified_input_ids = torch.cat([start_token, input_ids, end_tokens], dim=1)
 
     input_ids = modified_input_ids  # Ensure input IDs are on the correct GPU
-    input_ids=  input_ids.to(model.device)
+    input_ids=  input_ids.to('cuda')
 
     generation_kwargs = {
         "pad_token_id": 128258,
