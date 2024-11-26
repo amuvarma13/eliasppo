@@ -1,7 +1,7 @@
 import time
 import torch
 
-def generate_model_response(text, emotion, model, tokenizer):
+def generate_model_response(text, emotion, model, tokenizer, max_length=100):
     start_time = time.time()
 
     
@@ -22,7 +22,7 @@ def generate_model_response(text, emotion, model, tokenizer):
         "top_k": 50,
         "temperature": 0.5,
         "repetition_penalty": 1.1,
-        "max_length": 100,
+        "max_length": max_length,
         "eos_token_id": 128258
     }
 

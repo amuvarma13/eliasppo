@@ -45,26 +45,14 @@ emotion = "happy"
 # print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
 
 
-# ############## CODE TO SAVE GENERIC QUERY AND RESPONSE TENSORS ####################
-query_tensor, response_tensor = generate_model_response(query, emotion, model, tokenizer)
-
-torch.save(query_tensor, "query.pt")
-torch.save(response_tensor, "response.pt")
-
-# ####################################################################################
-
-
-
-
-############## CODE TO LOAD GENERIC QUERY AND RESPONSE TENSORS ####################
-
-# query_tensor = torch.load("query.pt")
-# response_tensor = torch.load("response.pt")
-
-####################################################################################
+max_tokens = 100 #num toks generated to analyse
 
 for i in range(100):
     print(f"processing sample {i}")
+
+    query_tensor, response_tensor = generate_model_response(query, emotion, ppo_trainer.model, tokenizer)
+    #use ppotrainer.model instead of model to get the updated model (otherwise it will be the same as the ref model)
+
     audio = convert_to_audio(response_tensor, tokenizer)
     audio_reward = get_reward_from_audio(audio )
     reward = [torch.tensor(audio_reward, dtype=torch.float32)]  # Example fixed reward
