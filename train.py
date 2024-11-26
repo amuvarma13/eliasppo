@@ -31,8 +31,37 @@ import torch
 
 model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 model = model.to("cuda")
+def freeze_except_qkv(model):
+    """
+    Freezes all parameters in the model except for the Query, Key, and Value projection layers
+    in the attention modules.
+    
+    Args:
+        model: The LLaMA model with value head
+    """
+    # First freeze everything
+    for param in model.parameters():
+        param.requires_grad = False
+    
+    # Then unfreeze only QKV layers
+    for name, module in model.named_modules():
+        if isinstance(module, type(model.pretrained_model.model.layers[0].self_attn)):
+            # Unfreeze Q, K, V projection layers
+            module.q_proj.weight.requires_grad = True
+            module.k_proj.weight.requires_grad = True
+            module.v_proj.weight.requires_grad = True
+    
+    # Print trainable parameter count
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    total_params = sum(p.numel() for p in model.parameters())
+    
+    print(f"Trainable parameters: {trainable_params:,}")
+    print(f"Total parameters: {total_params:,}")
+    print(f"Percentage trainable: {100 * trainable_params / total_params:.2f}%")
 
-print(model)
+# Example usage:
+freeze_except_qkv(model)
+# print(model)
 
 ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 
