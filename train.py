@@ -52,7 +52,7 @@ emotion = "happy"
 # print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
 
 
-max_tokens = 400 #num toks generated to analyse
+max_tokens = 800 #num toks generated to analyse
 
 for i in range(100):
     print(f"processing sample {i}")
