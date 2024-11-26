@@ -12,23 +12,11 @@ from generate_model_response import generate_model_response
 from convert_to_audio import convert_to_audio
 from get_reward_from_audio import get_reward_from_audio
 
+model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
+ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 
-
-
-
-model = AutoModelForCausalLMWithValueHead.from_pretrained(
-    "amuvarma/luna-3days-tagged-noreps",
-    # torch_dtype=torch.float16
-)
-
-model = model.to("cuda")
-ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps", 
-                                                    
-    # torch_dtype=torch.float16
-)
-
+model = model.to("cuda")                                         
 freeze_except_qkv(model)
-
 
 tkn = "meta-llama/Llama-3.2-3B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(tkn)
@@ -45,10 +33,8 @@ df = pd.read_csv(csv_path)
 queries = df["prompt"].tolist()
 emotions = df["emotion"].tolist()
 
-
 max_tokens = 400  #num toks generated to analyse
 log_steps = 4
-
 
 for i, (query, emotion) in enumerate(zip(queries, emotions)):
     print(f"processing sample {i}")
