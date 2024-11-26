@@ -29,6 +29,4 @@ def generate_model_response(text, emotion, model, tokenizer, max_length=100):
 
         response_tensor = model.generate(input_ids, **generation_kwargs)
 
-        print(f"Time taken to generate: {time.time() - start_time}")
-
         return input_ids, response_tensor

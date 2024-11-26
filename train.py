@@ -45,24 +45,24 @@ df = pd.read_csv(csv_path)
 queries = df["prompt"].tolist()
 emotions = df["emotion"].tolist()
 
-query=  "The old family photographs brought back the sweetest childhood memories."
-emotion = "happy"
 
-# for i, (query, emotion) in enumerate(zip(queries, emotions)):
-# print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
+max_tokens = 400  #num toks generated to analyse
+log_steps = 4
 
 
-max_tokens = 100 #num toks generated to analyse
-
-for i in range(100):
+for i, (query, emotion) in enumerate(zip(queries, emotions)):
     print(f"processing sample {i}")
 
     query_tensor, response_tensor = generate_model_response(query, emotion, ppo_trainer.model.module, tokenizer, max_length=max_tokens)
-    #use ppotrainer.model instead of model to get the updated model (otherwise it will be the same as the ref model)
+    #use ppotrainer.model instead of model to get the updated model (otherwise it will be the same as the ref model) (*i think)
 
     audio = convert_to_audio(response_tensor, tokenizer)
     audio_reward = get_reward_from_audio(audio )
     reward = [torch.tensor(audio_reward, dtype=torch.float32)]  # Example fixed reward
 
     train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
-    print(f"Training stats: {train_stats['ppo/loss/policy']}") # Print policy loss
+
+    if i % log_steps == 0:
+        policy_loss, value_loss, total_loss = train_stats["ppo/loss/policy"], train_stats["ppo/loss/value"], train_stats["ppo/loss/total"]
+        print(f"Policy loss: {policy_loss}, Value loss: {value_loss}, Total loss: {total_loss}")
+        #send to wandb if cba
