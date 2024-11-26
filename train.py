@@ -289,22 +289,25 @@ emotion = "happy"
 # for i, (query, emotion) in enumerate(zip(queries, emotions)):
 # print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
 
-query_tensor, response_tensor = generate_model_response(query, emotion)
 
-torch.save(query_tensor, "query.pt")
-torch.save(response_tensor, "response.pt")
+# ############## CODE TO SAVE GENERIC QUERY AND RESPONSE TENSORS ####################
+# query_tensor, response_tensor = generate_model_response(query, emotion)
+
+# torch.save(query_tensor, "query.pt")
+# torch.save(response_tensor, "response.pt")
+
+# ####################################################################################
+
+############## CODE TO LOAD GENERIC QUERY AND RESPONSE TENSORS ####################
+
+query_tensor = torch.load("query.pt")
+response_tensor = torch.load("response.pt")
+
+####################################################################################
 
 
-# # Step 5: Compute reward
-# # You can define your reward function or use a fixed reward for simplicity
-# audio = convert_to_audio(response_tensor)
-# audio_reward = get_reward_from_audio(audio)
-# reward = [torch.tensor(audio_reward)]  # Example fixed reward
+audio = convert_to_audio(response_tensor)
+audio_reward = get_reward_from_audio(audio)
+reward = [torch.tensor(audio_reward)]  # Example fixed reward
 
-
-
-# # Step 6: Train model with PPO
-# train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
-
-# # Close W&B run
-# # wandb.finish()
+train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
