@@ -283,24 +283,24 @@ def preprocess_audio(audio_data, sample_rate=16000):
 
 
 
+query=  "The old family photographs brought back the sweetest childhood memories."
+emotion = "happy"
+
+# for i, (query, emotion) in enumerate(zip(queries, emotions)):
+print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
+
+query_tensor, response_tensor = generate_model_response(query, emotion)
+
+# Step 5: Compute reward
+# You can define your reward function or use a fixed reward for simplicity
+audio = convert_to_audio(response_tensor)
+audio_reward = get_reward_from_audio(audio)
+reward = [torch.tensor(audio_reward)]  # Example fixed reward
 
 
 
-for i, (query, emotion) in enumerate(zip(queries, emotions)):
-    print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
-    
-    query_tensor, response_tensor = generate_model_response(query, emotion)
-
-    # Step 5: Compute reward
-    # You can define your reward function or use a fixed reward for simplicity
-    audio = convert_to_audio(response_tensor)
-    audio_reward = get_reward_from_audio(audio)
-    reward = [torch.tensor(audio_reward)]  # Example fixed reward
-
-    
-
-    # Step 6: Train model with PPO
-    train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
+# Step 6: Train model with PPO
+train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
 
 # Close W&B run
 # wandb.finish()
