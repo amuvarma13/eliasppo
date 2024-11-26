@@ -66,5 +66,3 @@ for i in range(100):
 
     train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
     print(f"Training stats: {train_stats["ppo/loss/policy"]}")
-    
-
