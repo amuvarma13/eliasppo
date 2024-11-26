@@ -50,7 +50,7 @@ max_tokens = 100 #num toks generated to analyse
 for i in range(100):
     print(f"processing sample {i}")
 
-    query_tensor, response_tensor = generate_model_response(query, emotion, ppo_trainer.model, tokenizer)
+    query_tensor, response_tensor = generate_model_response(query, emotion, ppo_trainer.model.module, tokenizer)
     #use ppotrainer.model instead of model to get the updated model (otherwise it will be the same as the ref model)
 
     audio = convert_to_audio(response_tensor, tokenizer)
