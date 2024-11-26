@@ -23,7 +23,10 @@ model = AutoModelForCausalLMWithValueHead.from_pretrained(
 )
 
 model = model.to("cuda")
-ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
+ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps", 
+                                                              attn_implementation="flash_attention_2",
+    torch_dtype=torch.float16
+)
 
 freeze_except_qkv(model)
 
