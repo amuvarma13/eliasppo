@@ -52,7 +52,7 @@ emotion = "happy"
 # print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
 
 
-max_tokens = 800 #num toks generated to analyse
+max_tokens = 100 #num toks generated to analyse
 
 for i in range(100):
     print(f"processing sample {i}")
@@ -65,5 +65,6 @@ for i in range(100):
     reward = [torch.tensor(audio_reward, dtype=torch.float32)]  # Example fixed reward
 
     train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
+    print(f"Training stats: {train_stats}")
     
 
