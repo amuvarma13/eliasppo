@@ -335,7 +335,7 @@ response_tensor = torch.load("response.pt")
 
 
 audio = convert_to_audio(response_tensor)
-audio_reward = get_reward_from_audio(audio)
+audio_reward = get_reward_from_audio(audio, dtype=torch.float32)
 reward = [torch.tensor(audio_reward)]  # Example fixed reward
 
 train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
