@@ -25,7 +25,8 @@ from huggingface_hub import hf_hub_download
 import torch
 from freeze_except_qkv import freeze_except_qkv
 from generate_model_response import generate_model_response
-from preprocess_audio import preprocess_audio
+
+from get_reward_from_audio import get_reward_from_audio
 
 
 
