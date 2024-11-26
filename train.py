@@ -65,6 +65,6 @@ for i in range(100):
     reward = [torch.tensor(audio_reward, dtype=torch.float32)]  # Example fixed reward
 
     train_stats = ppo_trainer.step([query_tensor[0]], [response_tensor[0]], reward)
-    print(f"Training stats: {train_stats}")
+    print(f"Training stats: {train_stats["ppo/loss/policy"]}")
     
 
