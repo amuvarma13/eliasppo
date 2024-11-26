@@ -287,7 +287,7 @@ query=  "The old family photographs brought back the sweetest childhood memories
 emotion = "happy"
 
 # for i, (query, emotion) in enumerate(zip(queries, emotions)):
-print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
+# print(f"Processing query {i+1}/{len(queries)}: {query} with emotion {emotion}")
 
 query_tensor, response_tensor = generate_model_response(query, emotion)
 
