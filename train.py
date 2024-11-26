@@ -22,8 +22,10 @@ from IPython.display import display
 from datasets import Dataset
 from naturalspeech3_facodec.ns3_codec import FACodecEncoder, FACodecDecoder
 from huggingface_hub import hf_hub_download
-from peft import get_peft_model, LoraConfig, TaskType
 import torch
+from freeze_except_qkv import freeze_except_qkv
+from generate_model_response import generate_model_response
+from preprocess_audio import preprocess_audio
 
 
 
@@ -31,37 +33,9 @@ import torch
 
 model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 model = model.to("cuda")
-def freeze_except_qkv(model):
-    """
-    Freezes all parameters in the model except for the Query, Key, and Value projection layers
-    in the attention modules.
-    
-    Args:
-        model: The LLaMA model with value head
-    """
-    # First freeze everything
-    for param in model.parameters():
-        param.requires_grad = False
-    
-    # Then unfreeze only QKV layers
-    for name, module in model.named_modules():
-        if isinstance(module, type(model.pretrained_model.model.layers[0].self_attn)):
-            # Unfreeze Q, K, V projection layers
-            module.q_proj.weight.requires_grad = True
-            module.k_proj.weight.requires_grad = True
-            module.v_proj.weight.requires_grad = True
-    
-    # Print trainable parameter count
-    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    total_params = sum(p.numel() for p in model.parameters())
-    
-    print(f"Trainable parameters: {trainable_params:,}")
-    print(f"Total parameters: {total_params:,}")
-    print(f"Percentage trainable: {100 * trainable_params / total_params:.2f}%")
 
-# Example usage:
+
 freeze_except_qkv(model)
-# print(model)
 
 ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
 
@@ -82,39 +56,6 @@ csv_path = "./prompts_emotions_shuffled.csv"
 df = pd.read_csv(csv_path)
 queries = df["prompt"].tolist()
 emotions = df["emotion"].tolist()
-
-
-def generate_model_response(text, emotion):
-    start_time = time.time()
-
-    
-    prompt = f'''<{emotion}> {text} </{emotion}>'''
-    input_ids = tokenizer(prompt, return_tensors="pt").input_ids
-
-    start_token = torch.tensor([[128259]], dtype=torch.int64)
-    end_tokens = torch.tensor([[128009, 128260, 128261]], dtype=torch.int64)
-
-    # Concatenate the tensors
-    modified_input_ids = torch.cat([start_token, input_ids, end_tokens], dim=1)
-
-    input_ids = modified_input_ids  # Ensure input IDs are on the correct GPU
-    attention_mask = torch.ones_like(input_ids)
-    input_ids=  input_ids.to("cuda")
-
-    generation_kwargs = {
-        "pad_token_id": 128258,
-        "top_k": 50,
-        "temperature": 0.5,
-        "repetition_penalty": 1.1,
-        "max_length": 100,
-        "eos_token_id": 128258
-    }
-
-    response_tensor = model.generate(input_ids, **generation_kwargs)
-
-    print(f"Time taken to generate: {time.time() - start_time}")
-
-    return input_ids, response_tensor
 
 
 fa_encoder = FACodecEncoder(
@@ -259,30 +200,6 @@ def convert_to_audio(generated_ids):
     return audio_bits
 
 
-vad_model = load_silero_vad()
-
-def get_reward_from_audio(audio, sample_rate=16000):
-    audio_tensor = preprocess_audio(audio, sample_rate=sample_rate)
-
-
-    speech_timestamps = get_speech_timestamps(audio_tensor, vad_model, return_seconds=True)
-
-
-    audio_len = len(audio) / sample_rate
-    start_time, end_time = process_speech_timestamps(speech_timestamps)
-
-    penalty = start_time/2
-    if penalty > 1:
-      penalty = 1
-
-    reward = 1 - penalty
-
-    if start_time == 0:
-      reward = 0
-
-    reward = round(reward, 2)
-
-    return reward
 
 
 def process_speech_timestamps(timestamps):
@@ -298,17 +215,6 @@ def process_speech_timestamps(timestamps):
   return start_time, end_time
 
 
-def preprocess_audio(audio_data, sample_rate=16000):
-    if len(audio_data) == 0:
-        return torch.zeros(1)
-
-    audio_data = np.int16(audio_data / np.max(np.abs(audio_data)) * 32767)
-    wav_buffer = io.BytesIO()
-    write(wav_buffer, sample_rate, audio_data)
-    wav_buffer.seek(0)
-    test_wav, _ = librosa.load(wav_buffer, sr=sample_rate)
-    return torch.from_numpy(test_wav).float()
-
 
 
 query=  "The old family photographs brought back the sweetest childhood memories."
@@ -319,17 +225,17 @@ emotion = "happy"
 
 
 # ############## CODE TO SAVE GENERIC QUERY AND RESPONSE TENSORS ####################
-# query_tensor, response_tensor = generate_model_response(query, emotion)
+query_tensor, response_tensor = generate_model_response(query, emotion, model, tokenizer)
 
-# torch.save(query_tensor, "query.pt")
-# torch.save(response_tensor, "response.pt")
+torch.save(query_tensor, "query.pt")
+torch.save(response_tensor, "response.pt")
 
 # ####################################################################################
 
 ############## CODE TO LOAD GENERIC QUERY AND RESPONSE TENSORS ####################
 
-query_tensor = torch.load("query.pt")
-response_tensor = torch.load("response.pt")
+# query_tensor = torch.load("query.pt")
+# response_tensor = torch.load("response.pt")
 
 ####################################################################################
 
