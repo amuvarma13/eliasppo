@@ -13,9 +13,7 @@ from convert_to_audio import convert_to_audio
 from get_reward_from_audio import get_reward_from_audio
 
 model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
-ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")
-
-model = model.to("cuda")                                         
+ref_model = AutoModelForCausalLMWithValueHead.from_pretrained("amuvarma/luna-3days-tagged-noreps")                                     
 freeze_except_qkv(model)
 
 tkn = "meta-llama/Llama-3.2-3B-Instruct"
